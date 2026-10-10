@@ -1,22 +1,36 @@
 const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080/api' : '/api');
 export const localDateString = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 const unsafe = method => !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method.toUpperCase());
-function csrfCookie() { const found = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')); return found ? decodeURIComponent(found.slice('XSRF-TOKEN='.length)) : ''; }
+// Keep the token returned by the CSRF bootstrap endpoint in memory. The API may
+// be reached through a same-origin proxy, where its cookie is intentionally
+// host-only and cannot be read from JavaScript running on another origin.
+let csrfToken = '';
+let csrfBootstrap;
 async function refreshCsrf() {
-  const response = await fetch(`${API}/auth/csrf`, { credentials: 'include' });
-  if (!response.ok) throw new Error('Could not initialize secure session token.');
-  await response.json();
-  return csrfCookie();
+  if (!csrfBootstrap) {
+    csrfBootstrap = (async () => {
+      const response = await fetch(`${API}/auth/csrf`, { credentials: 'include' });
+      if (!response.ok) throw new Error('Could not initialize secure session token.');
+      const payload = await response.json();
+      if (!payload.token) throw new Error('Could not initialize secure session token.');
+      csrfToken = payload.token;
+      return csrfToken;
+    })();
+  }
+  try { return await csrfBootstrap; }
+  finally { csrfBootstrap = undefined; }
 }
 async function request(path, options = {}) {
   const method = options.method || 'GET';
   const headers = { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers };
   if (unsafe(method)) {
-    let token = csrfCookie();
-    if (!token) token = await refreshCsrf();
-    headers['X-XSRF-TOKEN'] = token;
+    if (!csrfToken) await refreshCsrf();
+    headers['X-XSRF-TOKEN'] = csrfToken;
   }
   const response = await fetch(`${API}${path}`, { ...options, method, credentials: 'include', headers });
+  // Login and logout deliberately clear the server's CSRF cookie, so discard
+  // the corresponding in-memory token before the next state-changing request.
+  if ((path === '/auth/login' || path === '/auth/logout') && response.ok) csrfToken = '';
   if (!response.ok) {
     const problem = await response.json().catch(() => ({}));
     if (response.status === 401 && path !== '/auth/login') window.dispatchEvent(new Event('gym:unauthorized'));
