@@ -1,0 +1,9 @@
+package com.gym.management.entity;
+import jakarta.persistence.*;import java.math.BigDecimal;import java.time.*;
+@Entity @Table(name="meal_entries",indexes=@Index(name="idx_meal_member_time",columnList="member_id,occurred_at"))
+public class MealEntry{
+ @Id @GeneratedValue(strategy=GenerationType.IDENTITY)Long id;@ManyToOne(fetch=FetchType.LAZY,optional=false)@JoinColumn(name="member_id",nullable=false)Member member;@Column(nullable=false,length=100)String name;@Column(nullable=false,length=16)String category;@Column(nullable=false)LocalDateTime occurredAt;@Column(nullable=false,precision=7,scale=2)BigDecimal calories;@Column(precision=7,scale=2)BigDecimal proteinGrams;@Column(precision=7,scale=2)BigDecimal carbohydrateGrams;@Column(precision=7,scale=2)BigDecimal fatGrams;@Column(length=500)String notes;
+ protected MealEntry(){}public MealEntry(Member m,String n,String c,LocalDateTime at,BigDecimal calories,BigDecimal protein,BigDecimal carbs,BigDecimal fat,String notes){member=m;name=n;category=c;occurredAt=at;this.calories=calories;proteinGrams=protein;carbohydrateGrams=carbs;fatGrams=fat;this.notes=notes;}
+ public Long getId(){return id;}public Member getMember(){return member;}public String getName(){return name;}public String getCategory(){return category;}public LocalDateTime getOccurredAt(){return occurredAt;}public BigDecimal getCalories(){return calories;}public BigDecimal getProteinGrams(){return proteinGrams;}public BigDecimal getCarbohydrateGrams(){return carbohydrateGrams;}public BigDecimal getFatGrams(){return fatGrams;}public String getNotes(){return notes;}
+ public void update(String n,String c,LocalDateTime at,BigDecimal calories,BigDecimal protein,BigDecimal carbs,BigDecimal fat,String notes){name=n;category=c;occurredAt=at;this.calories=calories;proteinGrams=protein;carbohydrateGrams=carbs;fatGrams=fat;this.notes=notes;}
+}

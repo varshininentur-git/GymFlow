@@ -1,0 +1,7 @@
+package com.gym.management.entity;
+import jakarta.persistence.*;import java.time.*;
+@Entity @Table(name="gym_announcements",indexes=@Index(name="idx_announcement_dates",columnList="active,starts_at,ends_at"))
+public class GymAnnouncement{
+ @Id @GeneratedValue(strategy=GenerationType.IDENTITY)Long id;@Column(nullable=false,length=140)String title;@Column(nullable=false,length=3000)String message;@Column(nullable=false,length=16)String audience;@Column(nullable=false)LocalDateTime startsAt;LocalDateTime endsAt;@Column(nullable=false)boolean active=true;LocalDateTime createdAt=LocalDateTime.now();LocalDateTime updatedAt=LocalDateTime.now();
+ protected GymAnnouncement(){}public GymAnnouncement(String title,String message,String audience,LocalDateTime starts,LocalDateTime ends){this.title=title;this.message=message;this.audience=audience;startsAt=starts;endsAt=ends;}public Long getId(){return id;}public String getTitle(){return title;}public String getMessage(){return message;}public String getAudience(){return audience;}public LocalDateTime getStartsAt(){return startsAt;}public LocalDateTime getEndsAt(){return endsAt;}public boolean isActive(){return active;}public LocalDateTime getCreatedAt(){return createdAt;}public void update(String t,String m,String a,LocalDateTime start,LocalDateTime end,boolean active){title=t;message=m;audience=a;startsAt=start;endsAt=end;this.active=active;updatedAt=LocalDateTime.now();}
+}

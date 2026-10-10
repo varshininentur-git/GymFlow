@@ -1,0 +1,46 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+**/!.env.example
+
+# Java / Maven
+**/target/
+*.class
+
+# Node / Vite
+**/node_modules/
+**/dist/
+
+# Databases and local data
+*.mv.db
+*.trace.db
+*.lock.db
+*.h2.db
+backend/data/
+
+# IDE and OS files
+.DS_Store
+.idea/
+.vscode/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Local database files and data
+*.mv.db
+*.trace.db
+*.lock.db
+backend/data/
+
+# Build outputs and dependencies
+**/target/
+**/node_modules/
+**/dist/

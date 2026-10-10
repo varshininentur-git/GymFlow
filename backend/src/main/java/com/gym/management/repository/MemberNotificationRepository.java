@@ -1,0 +1,3 @@
+package com.gym.management.repository;
+import com.gym.management.entity.MemberNotification;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;
+public interface MemberNotificationRepository extends JpaRepository<MemberNotification,Long>{List<MemberNotification> findTop100ByMemberIdOrderByCreatedAtDesc(Long memberId);List<MemberNotification> findByMemberIdAndReadAtIsNull(Long memberId);List<MemberNotification> findByMemberIdAndCategory(Long memberId,String category);long countByMemberIdAndReadAtIsNull(Long memberId);boolean existsByDedupeKey(String key);Optional<MemberNotification> findByIdAndMemberId(Long id,Long memberId);}
